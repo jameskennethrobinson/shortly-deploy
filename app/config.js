@@ -1,3 +1,16 @@
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+mongoose.connect('mongodb://localhost/test');
+
+var userSchema = new Schema({
+  username: {type: String, required: true, unique: true},
+  password: {type: String, required: true}
+});
+
+var User = mongoose.model('User', userSchema);
+
+module.exports.user = User;
+
 // var Bookshelf = require('bookshelf');
 // var path = require('path');
 
@@ -46,15 +59,3 @@
 
 
 
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
-mongoose.connect('mongodb://localhost/test');
-
-var userSchema = new Schema({
-  username: {type: String, required: true, unique: true},
-  password: {type: String, required: true}
-});
-
-var User = mongoose.model('User', userSchema);
-
-module.exports = User;

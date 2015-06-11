@@ -8,7 +8,7 @@ iisnode.yml
 Icon
 
 # db
-shortly.sqlite
+db/**
 
 #node modules
 /node_modules/
