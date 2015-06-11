@@ -7,9 +7,19 @@ var userSchema = new Schema({
   password: {type: String, required: true}
 });
 
+var linkSchema = new Schema({
+  url: {type: String, required: true, unique: true},
+  base_url: {type: String, required: true},
+  code: {type: String, required: true, unique: true},
+  title: {type: String},
+  visits: {type: Number, required: true}
+})
+
 var User = mongoose.model('User', userSchema);
+var Link = mongoose.model('Link', linkSchema);
 
 module.exports.user = User;
+module.exports.link = Link;
 
 // var Bookshelf = require('bookshelf');
 // var path = require('path');
