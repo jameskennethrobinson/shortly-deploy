@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-mongoose.connect('mongodb://localhost/test');
+mongoose.connect('mongodb://localhost/shortly');
 
 var userSchema = new Schema({
   username: {type: String, required: true, unique: true},
@@ -8,12 +8,12 @@ var userSchema = new Schema({
 });
 
 var linkSchema = new Schema({
-  url: {type: String, required: true, unique: true},
+  url: {type: String, required: true},
   base_url: {type: String, required: true},
-  code: {type: String, required: true, unique: true},
+  code: {type: String},
   title: {type: String},
-  visits: {type: Number, required: true}
-})
+  visits: {type: Number}
+});
 
 var User = mongoose.model('User', userSchema);
 var Link = mongoose.model('Link', linkSchema);
