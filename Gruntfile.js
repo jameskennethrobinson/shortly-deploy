@@ -3,6 +3,13 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     concat: {
+      options: {
+        seperator: ';'
+      },
+      dist: {
+        src: ['public/client/**/*.js', 'public/client/**/*.js'],
+        dest: 'build/application.js'
+      }
     },
 
     mochaTest: {
@@ -21,62 +28,80 @@ module.exports = function(grunt) {
     },
 
     uglify: {
+      build: {
+        options: {
+          mangle: false
+        },
+        files: {
+          'build/application.js': [ 'build/**/*.js' ]
+        }
+      }
     },
 
     jshint: {
       files: [
         // Add filespec list here
         ],
-        options: {
-          force: 'true',
-          jshintrc: '.jshintrc',
-          ignores: [
-          'public/lib/**/*.js',
-          'public/dist/**/*.js'
-          ]
+      options: {
+        force: 'true',
+        jshintrc: '.jshintrc',
+        ignores: [
+        'public/lib/**/*.js',
+        'public/dist/**/*.js'
+        ]
+      }
+    },
+
+    cssmin: {
+      build: {
+        files: {
+          'build/application.css': [ 'build/**/*.css' ]
         }
-      },
+      }
+    },
 
-      cssmin: {
+    watch: {
+      options: { interval: 5007 },
+      scripts: {
+        files: ['public/client/**/*.js',
+                'public/lib/**/*.js'],
+        tasks: ['testTask']
       },
-
-      watch: {
-        scripts: {
-          files: [
-          'public/client/**/*.js',
-          'public/lib/**/*.js',
-          ],
-          tasks: [
-          'concat',
-          'uglify'
-          ]
-        },
-        css: {
-          files: 'public/*.css',
-          tasks: ['cssmin']
-        }
+      css: {
+        files: 'public/*.css',
+        tasks: ['testTask']
       },
-
-      shell: {
-        prodServer: {
-        }
-      },
-
       copy: {
-        build: {
-        //not sure about config options, "source" is dir files are relative to
+        files: ['../shortly-deploy/**', '!**/build/**', '!**/node_modules/**', '!public/client/**/*.js','!public/lib/**/*.js','!public/*.css'],
+        tasks: ['copy']
+      }
+    },
+
+    shell: {
+      prodServer: {
+      }
+    },
+
+    copy: {
+      build: {
         cwd: '../shortly-deploy',
         src: [ '**/*' , '!**/node_modules/**'],
         dest: 'build',
         expand: true
-      },
+      }
     },
 
     clean: {
       build: {
         src: [ 'build' ]
+      },
+      stylesheets: {
+        src: [ 'build/**/*.css', '!build/application.css' ]
+      },
+      scripts: {
+        src: [ 'build/**/*.js', '!build/application.js' ]
       }
-    },
+    }
   });
 
 grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -107,12 +132,23 @@ grunt.registerTask('server-dev', function (target) {
   // Main grunt tasks
   ////////////////////////////////////////////////////
 
-  grunt.registerTask('test', [
-    'mochaTest'
-    ]);
+  grunt.registerTask('tasktest',
+    ['']);
 
-  grunt.registerTask('build', [
-    ]);
+  grunt.registerTask('test',
+    ['mochaTest']);
+
+  grunt.registerTask('scripts',
+    'Compiles the Javascript files.',
+    ['uglify', 'clean:scripts']);
+
+  grunt.registerTask('stylesheets',
+    'Compiles the stylesheets.',
+    ['cssmin', 'clean:stylesheets' ]);
+
+  grunt.registerTask('build',
+    'Compiles all of the assets and copies the files to the build directory.',
+    ['clean:build', 'copy', 'stylesheets', 'scripts']);
 
   grunt.registerTask('upload', function(n) {
     if(grunt.option('prod')) {
@@ -122,11 +158,10 @@ grunt.registerTask('server-dev', function (target) {
     }
   });
 
-  grunt.registerTask('deploy', [
-    'test',
-    'build',
-    'upload'
-    ]);
+  grunt.registerTask('deploy',
+    ['test', 'build', 'upload']);
 
-
+  grunt.registerTask('default',
+    'Watched the project for changes and automatically builds them.',
+    ['build', 'watch']);
 };
